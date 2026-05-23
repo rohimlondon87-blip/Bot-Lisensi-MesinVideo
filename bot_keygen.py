@@ -6,6 +6,7 @@ import hashlib
 # ==========================================
 # KONFIGURASI BOT & KEAMANAN
 # ==========================================
+# MASUKKAN TOKEN BOT ANDA DI SINI
 BOT_TOKEN = "8981166779:AAFb8Il6WNV_EIXhyNKj8ExDBxjunsjD9BA"
 SECRET_SALT = "DjiW9@hXzP2*rKqLmN"
 
@@ -13,7 +14,7 @@ SECRET_SALT = "DjiW9@hXzP2*rKqLmN"
 ADMIN_CHAT_ID = "5506138692" 
 
 # KONTAK SUPPORT & PROMO
-NOMOR_WA = "6285280235833" 
+NOMOR_WA = "6285369354547" 
 PESAN_WA = "Halo Admin Mesin Video Pro, saya butuh bantuan."
 PESAN_PROMO = "Halo Admin, saya mau klaim Promo Spesial Mesin Video Pro dong!"
 
@@ -35,7 +36,6 @@ def send_welcome(message):
         )
         
         markup = InlineKeyboardMarkup()
-        # Tombol dijejer ke bawah (1 tombol 1 baris)
         markup.add(InlineKeyboardButton(text="🎁 Lihat Promo Hari Ini", callback_data="klik_promo"))
         markup.add(InlineKeyboardButton(text="💬 Hubungi Support (WhatsApp)", url=URL_WA))
 
@@ -69,7 +69,6 @@ def send_cs_info(message):
 @bot.message_handler(commands=['promo'])
 def send_promo_info(message):
     try:
-        # Teks promosi Anda (Silakan diedit kata-katanya sesuai kebutuhan)
         teks_promo = (
             "🎉 *PROMO SPESIAL HARI INI!* 🎉\n"
             "━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -87,7 +86,7 @@ def send_promo_info(message):
     except Exception as e:
         print(f"❌ Error menu Promo: {e}")
 
-# Logika jika tombol "Lihat Promo Hari Ini" pada menu /start di klik
+# Logika jika tombol "Lihat Promo Hari Ini" diklik
 @bot.callback_query_handler(func=lambda call: call.data == "klik_promo")
 def callback_promo(call):
     send_promo_info(call.message)
@@ -100,6 +99,7 @@ def generate_and_reply(message):
     try:
         hwid_pembeli = message.text.strip()
         
+        # JIKA BUKAN HWID (Kurang dari 15 Karakter)
         if len(hwid_pembeli) < 15:
             markup_err = InlineKeyboardMarkup()
             markup_err.add(InlineKeyboardButton(text="Tanya Admin 💬", url=URL_WA))

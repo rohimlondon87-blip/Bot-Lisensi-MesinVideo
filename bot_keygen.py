@@ -1,4 +1,3 @@
-'''python
 import telebot
 from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
 import hashlib
@@ -169,6 +168,3 @@ if __name__ == "__main__":
         bot.polling(none_stop=True, timeout=240)
     except Exception as e:
         print(f"ℹ️ Polling cycle selesai/terputus: {e}")
-
-
-```

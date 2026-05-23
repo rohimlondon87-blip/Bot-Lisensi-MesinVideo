@@ -1,4 +1,3 @@
-```python
 import telebot
 from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
 import hashlib

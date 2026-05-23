@@ -1,3 +1,4 @@
+'''python
 import telebot
 from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
 import hashlib
@@ -9,16 +10,16 @@ import hashlib
 BOT_TOKEN = "8981166779:AAFb8Il6WNV_EIXhyNKj8ExDBxjunsjD9BA"
 SECRET_SALT = "DjiW9@hXzP2*rKqLmN"
 
-# ⚠️ ID TELEGRAM ADMIN (Untuk menerima laporan penjualan)
+# ID TELEGRAM ADMIN (Untuk menerima laporan penjualan)
 ADMIN_CHAT_ID = "5506138692" 
 
-# KONTAK SUPPORT & PROMO
-NOMOR_WA = "6285369354547" 
+# KONTAK SUPPORT & LINK PROMO
+NOMOR_WA = "6285280235833" 
 PESAN_WA = "Halo Admin Mesin Video Pro, saya butuh bantuan."
-PESAN_PROMO = "Halo Admin, saya mau klaim Promo Spesial Mesin Video Pro dong!"
 
+# URL Tujuan
 URL_WA = f"https://wa.me/{NOMOR_WA}?text={PESAN_WA.replace(' ', '%20')}"
-URL_PROMO = f"https://wa.me/{NOMOR_WA}?text={PESAN_PROMO.replace(' ', '%20')}"
+URL_PROMO = "https://lynk.id/rohimlondon" # Tautan promo langsung ke Lynk.id
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -71,21 +72,19 @@ def send_promo_info(message):
         teks_promo = (
             "🎉 *PROMO SPESIAL HARI INI!* 🎉\n"
             "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "Dapatkan diskon *50%* untuk pembelian lisensi ke-2 Mesin Video Pro!\n"
-            "Atau gabung ke *Grup VIP Kreator Faceless* untuk mendapatkan tips & trik monetisasi YouTube.\n\n"
-            "💡 *Gunakan Kode Kupon:* `PROMO-JP`\n\n"
-            "Klik tombol di bawah ini untuk mengklaim promo sebelum kehabisan! 👇"
+            "Dapatkan penawaran menarik, diskon lisensi tambahan, dan akses ke Grup VIP kami!\n\n"
+            "Klik tombol di bawah ini untuk melihat semua promo dari Mesin Video Pro sebelum kehabisan! 👇"
         )
         
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton(text="🎁 Klaim Promo Sekarang", url=URL_PROMO))
+        markup.add(InlineKeyboardButton(text="🎁 Klaim Promo di Sini", url=URL_PROMO))
         
         bot.reply_to(message, teks_promo, parse_mode='Markdown', reply_markup=markup)
         print(f"✅ Membalas info Promo ke: {message.from_user.first_name}")
     except Exception as e:
         print(f"❌ Error menu Promo: {e}")
 
-# Logika jika tombol "Lihat Promo Hari Ini" diklik
+# Logika jika tombol "Lihat Promo Hari Ini" diklik dari menu utama
 @bot.callback_query_handler(func=lambda call: call.data == "klik_promo")
 def callback_promo(call):
     send_promo_info(call.message)
@@ -128,7 +127,7 @@ def generate_and_reply(message):
 
         bot.reply_to(message, pesan_balasan, parse_mode='Markdown', reply_markup=markup_key)
 
-        # Laporan Admin
+        # Laporan Admin Rahasia
         try:
             nama_user = message.from_user.first_name
             username = f"@{message.from_user.username}" if message.from_user.username else "Tidak ada username"

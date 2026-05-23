@@ -6,17 +6,19 @@ import hashlib
 # ==========================================
 # KONFIGURASI BOT & KEAMANAN
 # ==========================================
-# Masukkan Token Bot Telegram Kamu
 BOT_TOKEN = "8981166779:AAFb8Il6WNV_EIXhyNKj8ExDBxjunsjD9BA"
 SECRET_SALT = "DjiW9@hXzP2*rKqLmN"
 
 # ⚠️ ID TELEGRAM ADMIN (Untuk menerima laporan penjualan)
 ADMIN_CHAT_ID = "5506138692" 
 
-# KONTAK SUPPORT
+# KONTAK SUPPORT & PROMO
 NOMOR_WA = "6285280235833" 
 PESAN_WA = "Halo Admin Mesin Video Pro, saya butuh bantuan."
+PESAN_PROMO = "Halo Admin, saya mau klaim Promo Spesial Mesin Video Pro dong!"
+
 URL_WA = f"https://wa.me/{NOMOR_WA}?text={PESAN_WA.replace(' ', '%20')}"
+URL_PROMO = f"https://wa.me/{NOMOR_WA}?text={PESAN_PROMO.replace(' ', '%20')}"
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -32,10 +34,10 @@ def send_welcome(message):
             "dan sistem akan membalas dengan Serial Key Anda secara otomatis."
         )
         
-        # Tambahkan Tombol Support di pesan sapaan
         markup = InlineKeyboardMarkup()
-        btn_support = InlineKeyboardButton(text="💬 Hubungi Support (WhatsApp)", url=URL_WA)
-        markup.add(btn_support)
+        # Tombol dijejer ke bawah (1 tombol 1 baris)
+        markup.add(InlineKeyboardButton(text="🎁 Lihat Promo Hari Ini", callback_data="klik_promo"))
+        markup.add(InlineKeyboardButton(text="💬 Hubungi Support (WhatsApp)", url=URL_WA))
 
         bot.reply_to(message, teks_sapaan, parse_mode='Markdown', reply_markup=markup)
         print(f"✅ Membalas sapaan ke: {message.from_user.first_name}")
@@ -55,13 +57,40 @@ def send_cs_info(message):
         )
         
         markup = InlineKeyboardMarkup()
-        btn_wa = InlineKeyboardButton(text="💬 Chat via WhatsApp", url=URL_WA)
-        markup.add(btn_wa)
+        markup.add(InlineKeyboardButton(text="💬 Chat via WhatsApp", url=URL_WA))
         
         bot.reply_to(message, teks_cs, parse_mode='Markdown', reply_markup=markup)
-        print(f"✅ Membalas info CS ke: {message.from_user.first_name}")
     except Exception as e:
         print(f"❌ Error menu CS: {e}")
+
+# ==========================================
+# LOGIKA MENU PROMOSI (/promo)
+# ==========================================
+@bot.message_handler(commands=['promo'])
+def send_promo_info(message):
+    try:
+        # Teks promosi Anda (Silakan diedit kata-katanya sesuai kebutuhan)
+        teks_promo = (
+            "🎉 *PROMO SPESIAL HARI INI!* 🎉\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "Dapatkan diskon *50%* untuk pembelian lisensi ke-2 Mesin Video Pro!\n"
+            "Atau gabung ke *Grup VIP Kreator Faceless* untuk mendapatkan tips & trik monetisasi YouTube.\n\n"
+            "💡 *Gunakan Kode Kupon:* `PROMO-JP`\n\n"
+            "Klik tombol di bawah ini untuk mengklaim promo sebelum kehabisan! 👇"
+        )
+        
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton(text="🎁 Klaim Promo Sekarang", url=URL_PROMO))
+        
+        bot.reply_to(message, teks_promo, parse_mode='Markdown', reply_markup=markup)
+        print(f"✅ Membalas info Promo ke: {message.from_user.first_name}")
+    except Exception as e:
+        print(f"❌ Error menu Promo: {e}")
+
+# Logika jika tombol "Lihat Promo Hari Ini" pada menu /start di klik
+@bot.callback_query_handler(func=lambda call: call.data == "klik_promo")
+def callback_promo(call):
+    send_promo_info(call.message)
 
 # ==========================================
 # GENERATOR KUNCI LISENSI & LAPORAN ADMIN
@@ -70,10 +99,8 @@ def send_cs_info(message):
 def generate_and_reply(message):
     try:
         hwid_pembeli = message.text.strip()
-        print(f"📥 Menerima HWID: {hwid_pembeli}")
         
         if len(hwid_pembeli) < 15:
-            # Jika HWID salah, berikan juga tombol support
             markup_err = InlineKeyboardMarkup()
             markup_err.add(InlineKeyboardButton(text="Tanya Admin 💬", url=URL_WA))
             bot.reply_to(message, "⚠️ Format ID Komputer (HWID) tidak valid. Silakan copy dengan benar dari aplikasi.", reply_markup=markup_err)
@@ -97,15 +124,12 @@ def generate_and_reply(message):
             "Terima kasih! 🚀"
         )
         
-        # Tambahkan tombol Support di bawah Serial Key (Jaga-jaga jika pembeli bingung cara pakainya)
         markup_key = InlineKeyboardMarkup()
         markup_key.add(InlineKeyboardButton(text="☎️ Butuh Bantuan? Hubungi CS", url=URL_WA))
 
-        # 1. Kirim Kunci ke Pembeli
         bot.reply_to(message, pesan_balasan, parse_mode='Markdown', reply_markup=markup_key)
-        print(f"✅ Sukses mengirim kunci ke {message.from_user.first_name}")
 
-        # 2. Kirim Laporan Rahasia ke Admin
+        # Laporan Admin
         try:
             nama_user = message.from_user.first_name
             username = f"@{message.from_user.username}" if message.from_user.username else "Tidak ada username"
@@ -122,9 +146,8 @@ def generate_and_reply(message):
                 f"🔑 *Key Keluar:* `{formatted_key}`\n"
             )
             bot.send_message(ADMIN_CHAT_ID, laporan_admin, parse_mode='Markdown')
-            print("✅ Laporan berhasil dikirim ke Admin.")
-        except Exception as e_admin:
-            print(f"❌ Gagal mengirim laporan ke Admin: {e_admin}")
+        except Exception:
+            pass
 
     except Exception as e:
         print(f"❌ Error proses HWID: {e}")
@@ -139,9 +162,9 @@ if __name__ == "__main__":
     # Daftarkan Menu ke Bot Telegram secara otomatis
     bot.set_my_commands([
         BotCommand("start", "Mulai layanan aktivasi"),
+        BotCommand("promo", "🎁 Lihat Promo Spesial"),
         BotCommand("cs", "Hubungi Customer Service (WhatsApp)")
     ])
-    print("✅ Menu bot berhasil didaftarkan!")
     
     try:
         # Timeout 240 detik (4 menit)

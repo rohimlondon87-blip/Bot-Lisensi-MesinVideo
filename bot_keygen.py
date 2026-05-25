@@ -165,6 +165,6 @@ if __name__ == "__main__":
     
     try:
         # Timeout 240 detik (4 menit)
-        bot.polling(none_stop=True, timeout=240)
+        bot.polling(none_stop=True, timeout=330)
     except Exception as e:
         print(f"ℹ️ Polling cycle selesai/terputus: {e}")
